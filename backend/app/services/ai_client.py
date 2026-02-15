@@ -26,7 +26,7 @@ SUPPORTED_PROVIDERS = {PROVIDER_ANTHROPIC, PROVIDER_GOOGLE, PROVIDER_OPENAI}
 # Default models per provider
 DEFAULT_MODELS = {
     PROVIDER_ANTHROPIC: "claude-sonnet-4-5-20250929",
-    PROVIDER_GOOGLE: "gemini-1.5-flash",
+    PROVIDER_GOOGLE: "models/gemini-2.0-flash-lite",
     PROVIDER_OPENAI: "gpt-4o-mini",
 }
 
