@@ -11,9 +11,18 @@ import { PageWrapper } from "@/components/PageWrapper";
 
 const PROVIDERS = [
   {
+    id: "comet",
+    name: "CometAPI",
+    description: "500+ models via one key — recommended for free testing",
+    placeholder: "sk-...",
+    gradient: "from-violet-500 to-purple-600",
+    bgGradient: "from-violet-50 to-purple-50",
+    getKeyUrl: "https://www.cometapi.com/",
+  },
+  {
     id: "google",
     name: "Google Gemini",
-    description: "Free tier available — great for testing",
+    description: "Free tier available — may hit daily limits",
     placeholder: "AIza...",
     gradient: "from-blue-500 to-cyan-500",
     bgGradient: "from-blue-50 to-cyan-50",
@@ -41,7 +50,7 @@ const PROVIDERS = [
 
 export default function SettingsPage() {
   const [apiKey, setApiKey] = useState("");
-  const [provider, setProvider] = useState("google");
+  const [provider, setProvider] = useState("comet");
   const [saved, setSaved] = useState(false);
   const [hasKey, setHasKey] = useState(false);
 

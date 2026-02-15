@@ -14,7 +14,7 @@ function getApiKey(): string | null {
 
 function getProvider(): string {
   if (typeof window === "undefined") return "anthropic";
-  return localStorage.getItem("studyengine_ai_provider") || "anthropic";
+  return localStorage.getItem("studyengine_ai_provider") || "comet";
 }
 
 async function request<T>(

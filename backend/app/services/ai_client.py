@@ -20,15 +20,20 @@ logger = logging.getLogger(__name__)
 PROVIDER_ANTHROPIC = "anthropic"
 PROVIDER_GOOGLE = "google"
 PROVIDER_OPENAI = "openai"
+PROVIDER_COMET = "comet"
 
-SUPPORTED_PROVIDERS = {PROVIDER_ANTHROPIC, PROVIDER_GOOGLE, PROVIDER_OPENAI}
+SUPPORTED_PROVIDERS = {PROVIDER_ANTHROPIC, PROVIDER_GOOGLE, PROVIDER_OPENAI, PROVIDER_COMET}
 
 # Default models per provider
 DEFAULT_MODELS = {
     PROVIDER_ANTHROPIC: "claude-sonnet-4-5-20250929",
     PROVIDER_GOOGLE: "models/gemini-2.0-flash-lite",
     PROVIDER_OPENAI: "gpt-4o-mini",
+    PROVIDER_COMET: "claude-3-5-haiku-latest",  # cheap + fast via CometAPI proxy
 }
+
+# CometAPI base URL (OpenAI-compatible proxy)
+COMET_API_BASE = "https://api.cometapi.com/v1"
 
 
 def chat_completion(
@@ -71,6 +76,8 @@ def chat_completion(
         return _call_google(api_key, system_prompt, user_prompt, model, max_tokens)
     elif provider == PROVIDER_OPENAI:
         return _call_openai(api_key, system_prompt, user_prompt, model, max_tokens)
+    elif provider == PROVIDER_COMET:
+        return _call_comet(api_key, system_prompt, user_prompt, model, max_tokens)
 
     # Should never reach here
     raise ValueError(f"Unhandled provider: {provider}")
@@ -130,6 +137,32 @@ def _call_openai(
     from openai import OpenAI
 
     client = OpenAI(api_key=api_key)
+    response = client.chat.completions.create(
+        model=model,
+        max_tokens=max_tokens,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+    )
+    return response.choices[0].message.content or ""
+
+
+def _call_comet(
+    api_key: str,
+    system_prompt: str,
+    user_prompt: str,
+    model: str,
+    max_tokens: int,
+) -> str:
+    """Call CometAPI — an OpenAI-compatible proxy supporting 500+ models.
+
+    Uses the OpenAI SDK pointed at CometAPI's base URL.
+    Supports Claude, Gemini, GPT, DeepSeek, and more via a single key.
+    """
+    from openai import OpenAI
+
+    client = OpenAI(api_key=api_key, base_url=COMET_API_BASE)
     response = client.chat.completions.create(
         model=model,
         max_tokens=max_tokens,
