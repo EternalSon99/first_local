@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #fafafa;
+    --foreground: #0f172a;
+    --ring: #10b981;
+  }
+
+  body {
+    color: var(--foreground);
+    background: var(--background);
+    @apply antialiased;
+  }
+
+  ::selection {
+    background: rgba(16, 185, 129, 0.2);
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl border border-white/20;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-teal-500;
+  }
+
+  .bento-glow {
+    @apply transition-all duration-300;
+  }
+  .bento-glow:hover {
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2),
+                0 8px 30px rgba(16, 185, 129, 0.08);
+  }
+
+  .page-enter {
+    @apply animate-fade-in;
+  }
+}
