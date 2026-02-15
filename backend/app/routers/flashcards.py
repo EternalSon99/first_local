@@ -124,10 +124,10 @@ Output ONLY the JSON array."""
         )
     except Exception as e:
         err = str(e)
-        if "429" in err or "RESOURCE_EXHAUSTED" in err or "quota" in err.lower():
+        if "429" in err or "RESOURCE_EXHAUSTED" in err or "quota" in err.lower() or "insufficient" in err.lower() or "403" in err:
             raise HTTPException(
                 status_code=429,
-                detail=f"AI provider quota exceeded. Try switching providers in Settings, or wait and retry. ({provider})",
+                detail=f"AI provider quota/balance exhausted for '{provider}'. Try Groq (free) or another provider in Settings.",
             )
         if "401" in err or "invalid" in err.lower() or "api key" in err.lower():
             raise HTTPException(

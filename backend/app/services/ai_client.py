@@ -21,8 +21,9 @@ PROVIDER_ANTHROPIC = "anthropic"
 PROVIDER_GOOGLE = "google"
 PROVIDER_OPENAI = "openai"
 PROVIDER_COMET = "comet"
+PROVIDER_GROQ = "groq"
 
-SUPPORTED_PROVIDERS = {PROVIDER_ANTHROPIC, PROVIDER_GOOGLE, PROVIDER_OPENAI, PROVIDER_COMET}
+SUPPORTED_PROVIDERS = {PROVIDER_ANTHROPIC, PROVIDER_GOOGLE, PROVIDER_OPENAI, PROVIDER_COMET, PROVIDER_GROQ}
 
 # Default models per provider
 DEFAULT_MODELS = {
@@ -30,10 +31,14 @@ DEFAULT_MODELS = {
     PROVIDER_GOOGLE: "models/gemini-2.0-flash-lite",
     PROVIDER_OPENAI: "gpt-4o-mini",
     PROVIDER_COMET: "claude-3-5-haiku-latest",  # cheap + fast via CometAPI proxy
+    PROVIDER_GROQ: "llama-3.1-8b-instant",  # free tier, very fast
 }
 
 # CometAPI base URL (OpenAI-compatible proxy)
 COMET_API_BASE = "https://api.cometapi.com/v1"
+
+# Groq base URL (OpenAI-compatible, genuinely free tier)
+GROQ_API_BASE = "https://api.groq.com/openai/v1"
 
 
 def chat_completion(
@@ -78,6 +83,8 @@ def chat_completion(
         return _call_openai(api_key, system_prompt, user_prompt, model, max_tokens)
     elif provider == PROVIDER_COMET:
         return _call_comet(api_key, system_prompt, user_prompt, model, max_tokens)
+    elif provider == PROVIDER_GROQ:
+        return _call_groq(api_key, system_prompt, user_prompt, model, max_tokens)
 
     # Should never reach here
     raise ValueError(f"Unhandled provider: {provider}")
@@ -163,6 +170,33 @@ def _call_comet(
     from openai import OpenAI
 
     client = OpenAI(api_key=api_key, base_url=COMET_API_BASE)
+    response = client.chat.completions.create(
+        model=model,
+        max_tokens=max_tokens,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+    )
+    return response.choices[0].message.content or ""
+
+
+def _call_groq(
+    api_key: str,
+    system_prompt: str,
+    user_prompt: str,
+    model: str,
+    max_tokens: int,
+) -> str:
+    """Call Groq API — genuinely free tier, very fast inference.
+
+    Uses the OpenAI SDK pointed at Groq's base URL.
+    Get a free key at https://console.groq.com
+    Recommended models: llama-3.1-8b-instant, llama-3.3-70b-versatile
+    """
+    from openai import OpenAI
+
+    client = OpenAI(api_key=api_key, base_url=GROQ_API_BASE)
     response = client.chat.completions.create(
         model=model,
         max_tokens=max_tokens,

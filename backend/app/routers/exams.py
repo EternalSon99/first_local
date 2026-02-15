@@ -58,14 +58,25 @@ def start_exam(
     """Start a new exam session with AI-generated questions."""
     _verify_course(course_id, db)
 
-    session = start_exam_session(
-        db=db,
-        course_id=course_id,
-        level=body.level,
-        api_key=api_key,
-        force=body.force,
-        provider=provider,
-    )
+    try:
+        session = start_exam_session(
+            db=db,
+            course_id=course_id,
+            level=body.level,
+            api_key=api_key,
+            force=body.force,
+            provider=provider,
+        )
+    except Exception as e:
+        err = str(e)
+        if "429" in err or "RESOURCE_EXHAUSTED" in err or "quota" in err.lower() or "insufficient" in err.lower() or "403" in err:
+            raise HTTPException(
+                status_code=429,
+                detail=f"AI provider quota/balance exhausted for '{provider}'. Try Groq (free) or another provider in Settings.",
+            )
+        if "401" in err or "invalid" in err.lower() or "api key" in err.lower():
+            raise HTTPException(status_code=401, detail=f"Invalid API key for provider '{provider}'. Check Settings.")
+        raise HTTPException(status_code=500, detail=f"AI provider error: {err[:200]}")
 
     return _session_to_response(session)
 

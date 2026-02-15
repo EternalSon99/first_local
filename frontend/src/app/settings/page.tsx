@@ -11,9 +11,18 @@ import { PageWrapper } from "@/components/PageWrapper";
 
 const PROVIDERS = [
   {
+    id: "groq",
+    name: "Groq (Free)",
+    description: "Genuinely free tier — fast LLaMA models, no credit card",
+    placeholder: "gsk_...",
+    gradient: "from-rose-500 to-pink-600",
+    bgGradient: "from-rose-50 to-pink-50",
+    getKeyUrl: "https://console.groq.com/keys",
+  },
+  {
     id: "comet",
     name: "CometAPI",
-    description: "500+ models via one key — recommended for free testing",
+    description: "500+ models via one key — requires paid balance",
     placeholder: "sk-...",
     gradient: "from-violet-500 to-purple-600",
     bgGradient: "from-violet-50 to-purple-50",
@@ -50,13 +59,13 @@ const PROVIDERS = [
 
 export default function SettingsPage() {
   const [apiKey, setApiKey] = useState("");
-  const [provider, setProvider] = useState("comet");
+  const [provider, setProvider] = useState("groq");
   const [saved, setSaved] = useState(false);
   const [hasKey, setHasKey] = useState(false);
 
   useEffect(() => {
     const key = localStorage.getItem("studyengine_api_key") || "";
-    const prov = localStorage.getItem("studyengine_ai_provider") || "comet";
+    const prov = localStorage.getItem("studyengine_ai_provider") || "groq";
     setApiKey(key);
     setProvider(prov);
     setHasKey(!!key);
