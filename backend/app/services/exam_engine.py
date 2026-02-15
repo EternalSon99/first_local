@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.config import (
     EXAM_CONFIGS,
     EXAM_RETAKE_COOLDOWN_HOURS,
+    MAX_CHUNK_CHARS_IN_PROMPT,
     TIMER_GRACE_PERIOD_SECONDS,
 )
 from app.models.exam import ExamLevel, ExamQuestion, ExamSession, ExamStatus
@@ -217,7 +218,7 @@ def _build_question_generation_prompt(
     context_sections = []
     for ctx in contexts:
         chunks_text = "\n".join(
-            f"[{c.get('file_type', 'TEXTBOOK')} — {c['file_name']}, Page {c['page_number']}]\n{c['content']}"
+            f"[{c.get('file_type', 'TEXTBOOK')} — {c['file_name']}, Page {c['page_number']}]\n{c['content'][:MAX_CHUNK_CHARS_IN_PROMPT]}"
             for c in ctx["context"]
         ) if ctx["context"] else "No specific material available for this topic."
 

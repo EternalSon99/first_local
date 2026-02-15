@@ -9,6 +9,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy.orm import Session
 
+from app.config import MAX_CHUNK_CHARS_IN_PROMPT
 from app.database import get_db
 from app.models.course import Course
 from app.schemas.flashcard import (
@@ -83,9 +84,9 @@ def generate_flashcards(
             detail="No document material available for unlocked topics.",
         )
 
-    # Build context for question generation
+    # Build context for question generation — truncate each chunk to cap token cost
     context_text = "\n\n".join(
-        f"[Topic context]\n{c['content']}" for c in chunks
+        f"[Topic context]\n{c['content'][:MAX_CHUNK_CHARS_IN_PROMPT]}" for c in chunks
     )
 
     topic_list = "\n".join(f"- {t.name}" for t in eligible)

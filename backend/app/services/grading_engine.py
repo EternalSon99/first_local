@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
+from app.config import MAX_CHUNK_CHARS_IN_PROMPT
 from app.models.exam import ExamLevel, ExamQuestion, ExamSession, ExamStatus
 from app.services.ai_client import chat_completion, parse_json_response
 from app.services.mastery_engine import update_mastery
@@ -169,9 +170,10 @@ def _build_grading_prompt(
     )
 
     # Build context section from retrieved chunks with source type labels
+    # Truncate each chunk to cap token usage
     if chunks:
         context_text = "\n\n".join(
-            f"[{c.get('file_type', 'TEXTBOOK')} — {c['file_name']}, Page {c['page_number']}]\n{c['content']}"
+            f"[{c.get('file_type', 'TEXTBOOK')} — {c['file_name']}, Page {c['page_number']}]\n{c['content'][:MAX_CHUNK_CHARS_IN_PROMPT]}"
             for c in chunks
         )
     else:
@@ -245,7 +247,7 @@ def grade_flashcards(
     chunks = retrieve_for_exam(db, course_id, all_questions_text, include_mastered=False)
 
     context_text = "\n\n".join(
-        f"[Source: {c['file_name']}, Page {c['page_number']}]\n{c['content']}"
+        f"[Source: {c['file_name']}, Page {c['page_number']}]\n{c['content'][:MAX_CHUNK_CHARS_IN_PROMPT]}"
         for c in chunks
     ) if chunks else "No course material available."
 

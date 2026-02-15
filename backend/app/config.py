@@ -16,8 +16,9 @@ COURSES_DIR.mkdir(parents=True, exist_ok=True)
 CHROMA_DIR.mkdir(parents=True, exist_ok=True)
 
 # Document processing
-CHUNK_SIZE = 1000
-CHUNK_OVERLAP = 200
+# Smaller chunks = fewer tokens per AI call without losing meaning
+CHUNK_SIZE = 600
+CHUNK_OVERLAP = 100
 
 # Exam configurations
 EXAM_CONFIGS = {
@@ -61,9 +62,15 @@ EXAM_RETAKE_COOLDOWN_HOURS = 24
 TIMER_GRACE_PERIOD_SECONDS = 30
 
 # Retrieval
-TOP_K_CHUNKS = 5
+# 3 chunks per query is enough for focused questions and keeps token costs low
+TOP_K_CHUNKS = 3
 # Fetch more candidates from ChromaDB, then re-rank with source weights
-TOP_K_CANDIDATES = 15
+TOP_K_CANDIDATES = 10
+
+# Hard cap on characters per chunk inserted into prompts.
+# Prevents runaway token costs from unexpectedly large chunks.
+# ~400 chars ≈ ~100 tokens — keeps each chunk concise.
+MAX_CHUNK_CHARS_IN_PROMPT = 400
 
 # Source type priority weights for retrieval re-ranking.
 # Higher weight = more likely to appear in final results.

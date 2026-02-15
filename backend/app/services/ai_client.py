@@ -37,7 +37,7 @@ def chat_completion(
     user_prompt: str,
     provider: str = PROVIDER_ANTHROPIC,
     model: Optional[str] = None,
-    max_tokens: int = 4096,
+    max_tokens: int = 1024,
 ) -> str:
     """Send a chat completion request to the specified AI provider.
 
