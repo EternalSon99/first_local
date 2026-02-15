@@ -56,7 +56,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const key = localStorage.getItem("studyengine_api_key") || "";
-    const prov = localStorage.getItem("studyengine_ai_provider") || "google";
+    const prov = localStorage.getItem("studyengine_ai_provider") || "comet";
     setApiKey(key);
     setProvider(prov);
     setHasKey(!!key);
